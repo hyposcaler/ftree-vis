@@ -28,8 +28,8 @@ function redraw() {
     drawFatTree(conf['depth'], conf['width']);
 }
 
-function drawFatTree(depth, width) {
-    var k = Math.floor(width / 2);
+function drawFatTree(layers, ports) {
+    var k = Math.floor(ports / 2);
     var padg = 13;
     var padi = 12;
     var hline = 70;
@@ -42,15 +42,15 @@ function drawFatTree(depth, width) {
     var kexp = function (n) { return Math.pow(k, n); };
 
     d3.select("svg.main").remove();   
-    if (kexp(depth - 1) > 1500 || depth <= 0 || k <= 0) {
+    if (kexp(layers - 1) > 1500 || layers <= 0 || k <= 0) {
         return;
     }
 
-    var w = kexp(depth - 1) * padg + 200;
-    var h = (2 * depth) * hline;
+    var w = kexp(layers - 1) * padg + 200;
+    var h = (2 * layers) * hline;
 
     var svg = d3.select("body").append("svg")
-        .attr("width", w)
+        .attr("ports", w)
         .attr("height", h)
         .attr("class", "main")
         .append("g")
@@ -62,7 +62,7 @@ function drawFatTree(depth, width) {
         var ret = [];
 
         var ngroup = kexp(d);
-        var pergroup = kexp(depth - 1 - d);
+        var pergroup = kexp(layers - 1 - d);
 
         var wgroup = pergroup * padg;
         var wgroups = wgroup * (ngroup - 1);
@@ -80,7 +80,7 @@ function drawFatTree(depth, width) {
         return ret
     }
 
-    for (var i = 0; i < depth; i++) {
+    for (var i = 0; i < layers; i++) {
         linePositions[i] = podPositions(i);
     }
 
@@ -88,7 +88,7 @@ function drawFatTree(depth, width) {
         for (var j = 0, n = list.length; j < n; j++) {
             svg.append("rect")
                 .attr("class", "pod")
-                .attr("width", podw)
+                .attr("ports", podw)
                 .attr("height", podh)
                 .attr("x", list[j] - podw/2)
                 .attr("y", y - podh/2);
@@ -130,7 +130,7 @@ function drawFatTree(depth, width) {
     }
     
     function linePods(d, list1, list2, y1, y2) {
-        var pergroup = kexp(depth - 1 - d);
+        var pergroup = kexp(layers - 1 - d);
         var ngroup = kexp(d);
 
         var perbundle = pergroup / k;
@@ -155,15 +155,15 @@ function drawFatTree(depth, width) {
         }
     }
 
-    for (var i = 0; i < depth - 1; i++) {
+    for (var i = 0; i < layers - 1; i++) {
         linePods(i, linePositions[i], linePositions[i + 1], i * hline, (i + 1) * hline);
         linePods(i, linePositions[i], linePositions[i + 1], -i * hline, -(i + 1) * hline);
     }
 
-    drawHosts(linePositions[depth - 1], (depth - 1) * hline, 1);
-    drawHosts(linePositions[depth - 1], -(depth - 1) * hline, -1);
+    drawHosts(linePositions[layers - 1], (layers - 1) * hline, 1);
+    drawHosts(linePositions[layers - 1], -(layers - 1) * hline, -1);
 
-    for (var i = 0; i < depth; i++) {
+    for (var i = 0; i < layers; i++) {
         if (i == 0) {
             drawPods(linePositions[0], 0);
         } else {
